@@ -1,17 +1,10 @@
-from cgi import parse_qs
+def application(env, start_response):
+    text = ""
 
-def wsgi_application(environ, start_response):
+    for query in env['QUERY_STRING'].split("&"):
+        text += query + "\n"
 
-  query = parse_qs(environ['QUERY_STRING'], keep_blank_values=True)
-  body = []
-  for key, values in query.items():
-    for item in values:
-      body.append(key + "=" + item + "\n")
-   
-  status = '200 OK'
-  headers = [
-   ('Content-Type', 'text/plain')
-  ]
-  
-  start_response(status, headers)
-  return body
+    body = text.encode("utf-8")
+
+    start_response('200 OK', [('Content-Type', 'text/plain')])
+    return [body]
