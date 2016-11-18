@@ -1,43 +1,14 @@
-# stepik_web_lesons
-import socket, threading, string
-
-debug = True
-
-_connector = None
-_running = True
-
-_host = '0.0.0.0'
-_port = 2222
-_maxClient = 10
-_recvBuffer = 1024
-
-#def echo_read():
-    
-class talkToClient (threading.Thread):
-    def __init__(self, clientSock, addr):
-        self.clientSock = clientSock
-        self.addr = addr
-        threading.Thread.__init__(self)
-    def run (self):
+import socket                                                                   
+                                                                                
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)                           
+s.bind(('0.0.0.0', 2222))                                                     
+s.listen(5)                                                                     
+while True:                                                                     
+        client, address = s.accept()
         while True:
-            recvData = self.clientSock.recv (_recvBuffer)
-            if not recvData:
-                self.clientSock.send ('bye')
-                break
-            printd('Client ' + str (self.addr) + ' say "' + str (recvData) + '"')
-            self.clientSock.send (recvData)
-            if recvData == "exit":
-                break
-        self.clientSock.close ()
-
-_connector = socket.socket (socket.AF_INET, socket.SOCK_STREAM)
-_connector.bind ((str(_host), int(_port)))
-_connector.listen (int(_maxClient))
-
-while _running:
-    printd ('Running on ' + _host + ':' + str (_port) + '.')
-    channel, details = _connector.accept ()
-    printd ('Conect on : ' + str (details))
-    talkToClient (channel, details).start ()
-
-_connector.close ()
+        
+                data = client.recv(1024)
+                if not data: break
+                if data == "Close" or data == "close": client.close()
+        client.send(data)
+client.close()
